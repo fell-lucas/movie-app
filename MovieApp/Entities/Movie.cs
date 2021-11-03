@@ -4,7 +4,7 @@ namespace MovieApp.Entities
 {
   public record Movie
   {
-    public Guid id { get; init; }
+    public Guid Id { get; init; }
     public string ImdbId { get; init; }
     public string Title { get; init; }
     public string Image { get; init; }
