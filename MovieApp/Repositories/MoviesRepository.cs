@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MovieApp.Entities;
+using MovieApp.Enums;
 using MovieApp.Services;
 
 namespace MovieApp.Repositories
@@ -39,9 +41,19 @@ namespace MovieApp.Repositories
       return await itemsCollection.Find(filter).SingleOrDefaultAsync();
     }
 
-    public Task<IEnumerable<Movie>> GetMoviesAsync()
+    public async Task<IEnumerable<Movie>> GetMoviesFromDbAsync(WatchedFilter watchedFilter)
     {
-      throw new System.NotImplementedException();
+      FilterDefinition<Movie> filter = new BsonDocument();
+      switch (watchedFilter)
+      {
+        case WatchedFilter.Watched:
+          filter = filterBuilder.Eq(movie => movie.Watched, true);
+          break;
+        case WatchedFilter.Unwatched:
+          filter = filterBuilder.Eq(movie => movie.Watched, false);
+          break;
+      }
+      return await itemsCollection.Find(filter).ToListAsync();
     }
 
     public async Task<IEnumerable<Movie>> SearchMoviesFromApiAsync(string fts)

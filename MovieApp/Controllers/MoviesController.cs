@@ -5,19 +5,26 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using MovieApp.Entities;
-using System;
+using MovieApp.Enums;
 
 namespace MovieApp.Controllers
 {
   [ApiController]
   [Route("[controller]")]
-  public class MovieController : ControllerBase
+  public class MoviesController : ControllerBase
   {
     private readonly IMoviesRepository repository;
 
-    public MovieController(IMoviesRepository repository)
+    public MoviesController(IMoviesRepository repository)
     {
       this.repository = repository;
+    }
+
+    [HttpGet]
+    public async Task<IEnumerable<MovieDto>> GetMoviesAsync(WatchedFilter filter)
+    {
+      var movies = await repository.GetMoviesFromDbAsync(filter);
+      return movies.Select(movie => movie.AsDto());
     }
 
     [HttpGet("{imdbId}")]
@@ -34,14 +41,10 @@ namespace MovieApp.Controllers
     }
 
     [HttpGet("search")]
-    public async Task<ActionResult<IEnumerable<MovieSearchDto>>> SearchMoviesAsync(string fts)
+    public async Task<IEnumerable<MovieSearchDto>> SearchMoviesAsync(string fts)
     {
       var movies = (await repository.SearchMoviesFromApiAsync(fts)).Select(movie => movie.AsSearchDto());
-      if (!movies.Any())
-      {
-        return NotFound();
-      }
-      return Ok(movies);
+      return movies;
     }
 
     [HttpPost]
