@@ -15,7 +15,10 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using MovieApp.Repositories;
+using MovieApp.Services;
 using MovieApp.Settings;
+using Refit;
 
 namespace MovieApp
 {
@@ -45,6 +48,10 @@ namespace MovieApp
       {
         return new MongoClient(mongoDbSettings.ConnectionString);
       });
+
+      services.AddSingleton<IImdbApi>(serviceProvider => { return RestService.For<IImdbApi>("https://imdb-api.com/en/"); });
+
+      services.AddSingleton<IMoviesRepository, MoviesRepository>();
 
       services.AddControllers(options =>
       {
