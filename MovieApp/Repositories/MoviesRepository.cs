@@ -14,6 +14,8 @@ namespace MovieApp.Repositories
     private readonly IMongoCollection<Movie> itemsCollection;
     private readonly IImdbApi imdbApi;
 
+    private readonly FilterDefinitionBuilder<Movie> filterBuilder = Builders<Movie>.Filter;
+
     public MoviesRepository(IMongoClient mongoClient, IImdbApi imdbApi)
     {
       IMongoDatabase database = mongoClient.GetDatabase(databaseName);
@@ -31,9 +33,10 @@ namespace MovieApp.Repositories
       throw new System.NotImplementedException();
     }
 
-    public Task<Movie> GetMovieAsync(string imdbId)
+    public async Task<Movie> GetMovieFromDbAsync(string imdbId)
     {
-      throw new System.NotImplementedException();
+      var filter = filterBuilder.Eq(movie => movie.ImdbId, imdbId);
+      return await itemsCollection.Find(filter).SingleOrDefaultAsync();
     }
 
     public Task<IEnumerable<Movie>> GetMoviesAsync()
@@ -41,11 +44,18 @@ namespace MovieApp.Repositories
       throw new System.NotImplementedException();
     }
 
-    public async Task<IEnumerable<Movie>> SearchMoviesAsync(string fts)
+    public async Task<IEnumerable<Movie>> SearchMoviesFromApiAsync(string fts)
     {
       var response = await imdbApi.SearchMovies(fts);
       var movies = response.results.Select(movieResponse => movieResponse.AsMovie());
       return movies;
+    }
+
+    public async Task<Movie> SearchSingleMovieFromApiAsync(string imdbId)
+    {
+      var response = await imdbApi.SearchSingleMovie(imdbId);
+      var movie = response.results.Single().AsMovie();
+      return movie;
     }
 
     public Task UpdateMovieAsync(Movie movie)

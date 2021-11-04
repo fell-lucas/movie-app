@@ -4,6 +4,8 @@ using MovieApp.Dtos;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using MovieApp.Entities;
+using System;
 
 namespace MovieApp.Controllers
 {
@@ -18,10 +20,10 @@ namespace MovieApp.Controllers
       this.repository = repository;
     }
 
-    [HttpGet]
+    [HttpGet("{imdbId}")]
     public async Task<ActionResult<MovieDto>> GetMovieAsync(string imdbId)
     {
-      var movie = await repository.GetMovieAsync(imdbId);
+      var movie = await repository.GetMovieFromDbAsync(imdbId);
 
       if (movie is null)
       {
@@ -32,10 +34,30 @@ namespace MovieApp.Controllers
     }
 
     [HttpGet("search")]
-    public async Task<IEnumerable<MovieSearchDto>> SearchMoviesAsync(string fts)
+    public async Task<ActionResult<IEnumerable<MovieSearchDto>>> SearchMoviesAsync(string fts)
     {
-      var movies = (await repository.SearchMoviesAsync(fts)).Select(movie => movie.AsSearchDto());
-      return movies;
+      var movies = (await repository.SearchMoviesFromApiAsync(fts)).Select(movie => movie.AsSearchDto());
+      if (!movies.Any())
+      {
+        return NotFound();
+      }
+      return Ok(movies);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<MovieDto>> CreateMovieAsync(CreateMovieDto movieDto)
+    {
+      var existingMovie = await repository.GetMovieFromDbAsync(movieDto.ImdbId);
+      if (existingMovie is not null)
+      {
+        return Conflict();
+      }
+
+      var movie = await repository.SearchSingleMovieFromApiAsync(movieDto.ImdbId) with { Watched = movieDto.Watched };
+
+      await repository.CreateMovieAsync(movie);
+
+      return CreatedAtAction(nameof(GetMovieAsync), new { imdbId = movie.ImdbId }, movie.AsDto());
     }
   }
 }
