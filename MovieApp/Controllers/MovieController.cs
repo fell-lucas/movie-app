@@ -3,6 +3,7 @@ using MovieApp.Repositories;
 using MovieApp.Dtos;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MovieApp.Controllers
 {
@@ -28,6 +29,13 @@ namespace MovieApp.Controllers
       }
 
       return movie.AsDto();
+    }
+
+    [HttpGet("search")]
+    public async Task<IEnumerable<MovieSearchDto>> SearchMoviesAsync(string fts)
+    {
+      var movies = (await repository.SearchMoviesAsync(fts)).Select(movie => movie.AsSearchDto());
+      return movies;
     }
   }
 }
