@@ -43,7 +43,7 @@ namespace MovieApp.Repositories
 
     public async Task<IEnumerable<Movie>> SearchMoviesAsync(string fts)
     {
-      var response = await imdbApi.GetMovies(fts);
+      var response = await imdbApi.SearchMovies(fts);
       var movies = response.results.Select(movieResponse => movieResponse.AsMovie());
       return movies;
     }

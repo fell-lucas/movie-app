@@ -7,7 +7,7 @@ namespace MovieApp.Services
 {
   public interface IImdbApi
   {
-    [Get("/API/SearchMovie/k_ea78tn3s/{fts}")]
-    Task<ImdbResponse> GetMovies(string fts);
+    [Get("/API/SearchMovie/{apikey}/{fts}")]
+    Task<ImdbResponse> SearchMovies(string fts, string apikey = Constants.apiKey);
   }
 }
