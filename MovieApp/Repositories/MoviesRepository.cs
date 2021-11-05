@@ -29,9 +29,10 @@ namespace MovieApp.Repositories
       await itemsCollection.InsertOneAsync(movie);
     }
 
-    public Task DeleteMovieAsync(Movie movie)
+    public async Task DeleteMovieAsync(string imdbId)
     {
-      throw new System.NotImplementedException();
+      var filter = filterBuilder.Eq(movie => movie.ImdbId, imdbId);
+      await itemsCollection.DeleteOneAsync(filter);
     }
 
     public async Task<Movie> GetMovieFromDbAsync(string imdbId)
@@ -40,18 +41,19 @@ namespace MovieApp.Repositories
       return await itemsCollection.Find(filter).SingleOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<Movie>> GetMoviesFromDbAsync(WatchedFilter watchedFilter)
+    public async Task<IEnumerable<Movie>> GetAllMoviesFromDbAsync()
     {
-      FilterDefinition<Movie> filter = new BsonDocument();
-      switch (watchedFilter)
-      {
-        case WatchedFilter.Watched:
-          filter = filterBuilder.Eq(movie => movie.Watched, true);
-          break;
-        case WatchedFilter.Unwatched:
-          filter = filterBuilder.Eq(movie => movie.Watched, false);
-          break;
-      }
+      return await itemsCollection.Find(new BsonDocument()).ToListAsync();
+    }
+
+    public async Task<IEnumerable<Movie>> GetWatchedMoviesFromDbAsync()
+    {
+      var filter = filterBuilder.Eq(movie => movie.Watched, true);
+      return await itemsCollection.Find(filter).ToListAsync();
+    }
+    public async Task<IEnumerable<Movie>> GetUnwatchedMoviesFromDbAsync()
+    {
+      var filter = filterBuilder.Eq(movie => movie.Watched, false);
       return await itemsCollection.Find(filter).ToListAsync();
     }
 
@@ -69,9 +71,10 @@ namespace MovieApp.Repositories
       return movie;
     }
 
-    public Task UpdateMovieAsync(Movie movie)
+    public async Task UpdateMovieAsync(Movie movie)
     {
-      throw new System.NotImplementedException();
+      var filter = filterBuilder.Eq(existingMovie => existingMovie.ImdbId, movie.ImdbId);
+      await itemsCollection.ReplaceOneAsync(filter, movie);
     }
   }
 }

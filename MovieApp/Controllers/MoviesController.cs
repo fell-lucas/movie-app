@@ -21,9 +21,23 @@ namespace MovieApp.Controllers
     }
 
     [HttpGet]
-    public async Task<IEnumerable<MovieDto>> GetMoviesAsync(WatchedFilter filter)
+    public async Task<IEnumerable<MovieDto>> GetAllMoviesAsync()
     {
-      var movies = await repository.GetMoviesFromDbAsync(filter);
+      var movies = await repository.GetAllMoviesFromDbAsync();
+      return movies.Select(movie => movie.AsDto());
+    }
+
+    [HttpGet("watched")]
+    public async Task<IEnumerable<MovieDto>> GetWatchedMoviesAsync()
+    {
+      var movies = await repository.GetWatchedMoviesFromDbAsync();
+      return movies.Select(movie => movie.AsDto());
+    }
+
+    [HttpGet("unwatched")]
+    public async Task<IEnumerable<MovieDto>> GetUnwatchedMoviesAsync()
+    {
+      var movies = await repository.GetUnwatchedMoviesFromDbAsync();
       return movies.Select(movie => movie.AsDto());
     }
 

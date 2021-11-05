@@ -10,10 +10,12 @@ namespace MovieApp.Repositories
     Task<IEnumerable<Movie>> SearchMoviesFromApiAsync(string fts);
     Task<Movie> SearchSingleMovieFromApiAsync(string imdbId);
     Task<Movie> GetMovieFromDbAsync(string imdbId);
-    Task<IEnumerable<Movie>> GetMoviesFromDbAsync(WatchedFilter filter);
+    Task<IEnumerable<Movie>> GetAllMoviesFromDbAsync();
+    Task<IEnumerable<Movie>> GetWatchedMoviesFromDbAsync();
+    Task<IEnumerable<Movie>> GetUnwatchedMoviesFromDbAsync();
     Task CreateMovieAsync(Movie movie);
     Task UpdateMovieAsync(Movie movie);
-    Task DeleteMovieAsync(Movie movie);
+    Task DeleteMovieAsync(string imdbId);
 
   }
 }
