@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MovieApp.Entities;
-using MovieApp.Enums;
 using MovieApp.Services;
 
 namespace MovieApp.Repositories

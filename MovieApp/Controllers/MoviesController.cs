@@ -4,8 +4,6 @@ using MovieApp.Dtos;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
-using MovieApp.Entities;
-using MovieApp.Enums;
 
 namespace MovieApp.Controllers
 {
@@ -75,6 +73,35 @@ namespace MovieApp.Controllers
       await repository.CreateMovieAsync(movie);
 
       return CreatedAtAction(nameof(GetMovieAsync), new { imdbId = movie.ImdbId }, movie.AsDto());
+    }
+
+    [HttpPut("{imdbId}")]
+    public async Task<ActionResult> UpdateMovieAsync(string imdbId, UpdateMovieDto moviedto)
+    {
+      var existingMovie = await repository.GetMovieFromDbAsync(imdbId);
+      if (existingMovie is null)
+      {
+        return NotFound();
+      }
+      var updatedMovie = existingMovie with { Watched = moviedto.Watched };
+
+      await repository.UpdateMovieAsync(updatedMovie);
+
+      return NoContent();
+    }
+
+    [HttpDelete("{imdbId}")]
+    public async Task<ActionResult> DeleteMovieAsync(string imdbId)
+    {
+      var movie = await repository.GetMovieFromDbAsync(imdbId);
+      if (movie is null)
+      {
+        return NotFound();
+      }
+
+      await repository.DeleteMovieAsync(imdbId);
+
+      return NoContent();
     }
   }
 }

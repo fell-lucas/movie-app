@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MovieApp.Entities;
-using MovieApp.Enums;
 
 namespace MovieApp.Repositories
 {
