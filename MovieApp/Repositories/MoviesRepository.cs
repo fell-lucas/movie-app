@@ -15,7 +15,6 @@ namespace MovieApp.Repositories
     private const string collectionName = "movies";
     private readonly IMongoCollection<Movie> itemsCollection;
     private readonly IImdbApi imdbApi;
-
     private readonly FilterDefinitionBuilder<Movie> filterBuilder = Builders<Movie>.Filter;
 
     public MoviesRepository(IMongoClient mongoClient, IImdbApi imdbApi)

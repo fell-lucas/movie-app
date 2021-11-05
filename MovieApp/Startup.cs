@@ -50,7 +50,10 @@ namespace MovieApp
         return new MongoClient(mongoDbSettings.ConnectionString);
       });
 
-      services.AddSingleton<IImdbApi>(serviceProvider => { return RestService.For<IImdbApi>("https://imdb-api.com/en/"); });
+      services.AddSingleton<IImdbApi>(serviceProvider =>
+      {
+        return RestService.For<IImdbApi>("https://imdb-api.com/en/");
+      });
 
       services.AddSingleton<IMoviesRepository, MoviesRepository>();
 
