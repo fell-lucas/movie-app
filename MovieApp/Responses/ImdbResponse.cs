@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MovieApp.Responses
 {
+  [ExcludeFromCodeCoverage]
   public record ImdbResponse
   {
     public string searchType { get; init; }

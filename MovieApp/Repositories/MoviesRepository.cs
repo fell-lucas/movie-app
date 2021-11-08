@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson;
@@ -8,6 +9,7 @@ using MovieApp.Services;
 
 namespace MovieApp.Repositories
 {
+  [ExcludeFromCodeCoverage]
   public class MoviesRepository : IMoviesRepository
   {
     private const string databaseName = "movieApp";

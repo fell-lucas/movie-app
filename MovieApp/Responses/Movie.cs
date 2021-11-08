@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace MovieApp.Responses
 {
+  [ExcludeFromCodeCoverage]
   public class MovieResponse
   {
     public string id { get; set; }

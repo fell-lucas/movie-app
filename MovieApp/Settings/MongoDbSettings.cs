@@ -1,5 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace MovieApp.Settings
 {
+  [ExcludeFromCodeCoverage]
   public class MongoDbSettings
   {
     public string Host { get; set; }
