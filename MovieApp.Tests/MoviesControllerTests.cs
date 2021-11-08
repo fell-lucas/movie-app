@@ -144,6 +144,79 @@ namespace MovieApp.Tests
             );
         }
 
+        [Fact]
+        public async Task CreateMovieAsync_WithExistingMovie_ReturnsConflict()
+        {
+            var movieToCreate = CreateRandomMovie().AsCreateMovieDto();
+            var existingMovie = CreateRandomMovie() with { ImdbId = movieToCreate.ImdbId };
+            repositoryStub
+                .Setup(repo => repo.GetMovieFromDbAsync(It.IsAny<String>()))
+                .ReturnsAsync(existingMovie);
+            var controller = new MoviesController(repositoryStub.Object);
+
+            var result = await controller.CreateMovieAsync(movieToCreate);
+
+            result.Result.Should().BeOfType<ConflictResult>();
+        }
+
+        [Fact]
+        public async Task UpdateMovieAsync_WithExistingItem_ReturnsNoContent()
+        {
+            var existingMovie = CreateRandomMovie();
+            repositoryStub
+                .Setup(repo => repo.GetMovieFromDbAsync(It.IsAny<String>()))
+                .ReturnsAsync(existingMovie);
+            var updatedMovie = new UpdateMovieDto(rand.Next(2) == 0);
+            var controller = new MoviesController(repositoryStub.Object);
+
+            var result = await controller.UpdateMovieAsync(existingMovie.ImdbId, updatedMovie);
+
+            result.Should().BeOfType<NoContentResult>();
+        }
+
+        [Fact]
+        public async Task UpdateMovieAsync_WithNonExistingMovie_ReturnsNotFound()
+        {
+            var existingMovie = CreateRandomMovie();
+            repositoryStub
+                .Setup(repo => repo.GetMovieFromDbAsync(It.IsAny<String>()))
+                .ReturnsAsync((Movie)null);
+            var updatedMovie = new UpdateMovieDto(rand.Next(2) == 0);
+            var controller = new MoviesController(repositoryStub.Object);
+
+            var result = await controller.UpdateMovieAsync(existingMovie.ImdbId, updatedMovie);
+
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Fact]
+        public async Task DeleteMovieAsync_WithExistingMovie_ReturnsNoContent()
+        {
+            var existingMovie = CreateRandomMovie();
+            repositoryStub
+                .Setup(repo => repo.GetMovieFromDbAsync(It.IsAny<String>()))
+                .ReturnsAsync(existingMovie);
+            var controller = new MoviesController(repositoryStub.Object);
+
+            var result = await controller.DeleteMovieAsync(existingMovie.ImdbId);
+
+            result.Should().BeOfType<NoContentResult>();
+        }
+
+        [Fact]
+        public async Task DeleteMovieAsync_WithNonExistingMovie_ReturnsNotFound()
+        {
+            var existingMovie = CreateRandomMovie();
+            repositoryStub
+                .Setup(repo => repo.GetMovieFromDbAsync(It.IsAny<String>()))
+                .ReturnsAsync((Movie)null);
+            var controller = new MoviesController(repositoryStub.Object);
+
+            var result = await controller.DeleteMovieAsync(existingMovie.ImdbId);
+
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
         private Movie CreateRandomMovie()
         {
             var str = rand.Next(1000).ToString();
