@@ -5,6 +5,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using MovieApp.Controllers;
+using MovieApp.Dtos;
 using MovieApp.Entities;
 using MovieApp.Repositories;
 using Xunit;
@@ -99,6 +100,48 @@ namespace MovieApp.Tests
             var result = await controller.GetWatchedMoviesAsync();
 
             result.Should().Equal(movieList.Select(movie => movie.AsDto()));
+        }
+
+        [Fact]
+        public async Task SearchMovieAsync_WithSearch_ReturnsMovies()
+        {
+            var movieList = new Movie[] {
+                CreateRandomMovie(),
+                CreateRandomMovie(),
+                CreateRandomMovie(),
+            };
+            var search = "abc";
+            repositoryStub
+                .Setup(repo => repo.SearchMoviesFromApiAsync(search))
+                .ReturnsAsync(movieList);
+            var controller = new MoviesController(repositoryStub.Object);
+
+            var result = await controller.SearchMoviesAsync(search);
+
+            result.Should().Equal(movieList.Select(movie => movie.AsSearchDto()));
+        }
+
+        [Fact]
+        public async Task CreateMovieAsync_WithNoExistingMovie_ReturnsCreatedAt()
+        {
+            var movieToCreate = CreateRandomMovie().AsCreateMovieDto();
+            repositoryStub
+                .Setup(repo => repo.GetMovieFromDbAsync(It.IsAny<String>()))
+                .ReturnsAsync((Movie)null);
+            var movie = CreateRandomMovie();
+            repositoryStub
+                .Setup(repo => repo.SearchSingleMovieFromApiAsync(It.IsAny<String>()))
+                .ReturnsAsync(movie with { ImdbId = movieToCreate.ImdbId });
+            var controller = new MoviesController(repositoryStub.Object);
+
+            var result = await controller.CreateMovieAsync(movieToCreate);
+
+            var createdMovie = (result.Result as CreatedAtActionResult).Value as MovieDto;
+            movieToCreate.Should().BeEquivalentTo(
+                createdMovie,
+                options => options.ComparingByMembers<MovieDto>()
+                    .ExcludingMissingMembers()
+            );
         }
 
         private Movie CreateRandomMovie()
