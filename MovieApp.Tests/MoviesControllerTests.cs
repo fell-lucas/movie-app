@@ -64,6 +64,43 @@ namespace MovieApp.Tests
             result.Should().Equal(movieList.Select(movie => movie.AsDto()));
         }
 
+        [Fact]
+        public async Task GetUnwatchedMoviesAsync_NoParams_ReturnsMovieList()
+        {
+            var movieList = new Movie[] {
+                CreateRandomMovie(),
+                CreateRandomMovie(),
+                CreateRandomMovie(),
+            };
+            repositoryStub
+                .Setup(repo => repo.GetUnwatchedMoviesFromDbAsync())
+                .ReturnsAsync(movieList);
+
+            var controller = new MoviesController(repositoryStub.Object);
+
+            var result = await controller.GetUnwatchedMoviesAsync();
+
+            result.Should().Equal(movieList.Select(movie => movie.AsDto()));
+        }
+        [Fact]
+        public async Task GetWatchedMoviesAsync_NoParams_ReturnsMovieList()
+        {
+            var movieList = new Movie[] {
+                CreateRandomMovie(),
+                CreateRandomMovie(),
+                CreateRandomMovie(),
+            };
+            repositoryStub
+                .Setup(repo => repo.GetWatchedMoviesFromDbAsync())
+                .ReturnsAsync(movieList);
+
+            var controller = new MoviesController(repositoryStub.Object);
+
+            var result = await controller.GetWatchedMoviesAsync();
+
+            result.Should().Equal(movieList.Select(movie => movie.AsDto()));
+        }
+
         private Movie CreateRandomMovie()
         {
             var str = rand.Next(1000).ToString();

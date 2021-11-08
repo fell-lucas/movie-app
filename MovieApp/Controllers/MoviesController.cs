@@ -55,7 +55,8 @@ namespace MovieApp.Controllers
     [HttpGet("search")]
     public async Task<IEnumerable<MovieSearchDto>> SearchMoviesAsync(string fts)
     {
-      var movies = (await repository.SearchMoviesFromApiAsync(fts)).Select(movie => movie.AsSearchDto());
+      var movies = (await repository.SearchMoviesFromApiAsync(fts))
+        .Select(movie => movie.AsSearchDto());
       return movies;
     }
 
