@@ -11,5 +11,8 @@ namespace MovieApp.Services
 
     [Get("/API/SearchMovie/{apikey}/{imdbId}")]
     Task<ImdbResponse> SearchSingleMovie(string imdbId, string apikey = Constants.apiKey);
+
+    [Get("/API/Title/{apikey}/{imdbId}")]
+    Task<DetailedMovie> SearchDetailedMovie(string imdbId, string apikey = Constants.apiKey);
   }
 }

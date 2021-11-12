@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MovieApp.Entities;
+using MovieApp.Responses;
 using MovieApp.Services;
 
 namespace MovieApp.Repositories
@@ -76,6 +77,10 @@ namespace MovieApp.Repositories
     {
       var filter = filterBuilder.Eq(existingMovie => existingMovie.ImdbId, movie.ImdbId);
       await itemsCollection.ReplaceOneAsync(filter, movie);
+    }
+
+    public async Task<DetailedMovie> SearchDetailedMovieFromApiAsync(string imdbId) {
+      return await imdbApi.SearchDetailedMovie(imdbId);
     }
   }
 }

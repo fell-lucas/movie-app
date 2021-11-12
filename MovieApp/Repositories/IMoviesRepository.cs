@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MovieApp.Entities;
+using MovieApp.Responses;
 
 namespace MovieApp.Repositories
 {
@@ -15,6 +16,6 @@ namespace MovieApp.Repositories
     Task CreateMovieAsync(Movie movie);
     Task UpdateMovieAsync(Movie movie);
     Task DeleteMovieAsync(string imdbId);
-
+    Task<DetailedMovie> SearchDetailedMovieFromApiAsync(string imdbId);
   }
 }

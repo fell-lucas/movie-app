@@ -4,6 +4,7 @@ using MovieApp.Dtos;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using MovieApp.Responses;
 
 namespace MovieApp.Controllers
 {
@@ -103,6 +104,15 @@ namespace MovieApp.Controllers
       await repository.DeleteMovieAsync(imdbId);
 
       return NoContent();
+    }
+
+    [HttpGet("detailed/{imdbId}")]
+    public async Task<ActionResult<DetailedMovie>> SearchDetailedMovieAsync(string imdbId) {
+      var movie = await repository.SearchDetailedMovieFromApiAsync(imdbId);
+      if(movie is null) {
+        return NotFound();
+      }
+      return Ok(movie);
     }
   }
 }
