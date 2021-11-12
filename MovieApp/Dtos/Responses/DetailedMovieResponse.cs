@@ -1,6 +1,6 @@
-namespace MovieApp.Responses
+namespace MovieApp.Dtos.Movie.Responses
 {
-    public record DetailedMovie
+    public record DetailedMovieResponse
     {
         public string id { get; init; }
         public string title { get; init; }
@@ -10,8 +10,8 @@ namespace MovieApp.Responses
         public string runtimeStr { get; init; }
         public string plot { get; init; }
         public string awards { get; init; }
-        public Director[] directorList { get; init; }
-        public Actor[] actorList { get; init; }
+        public DirectorResponse[] directorList { get; init; }
+        public ActorResponse[] actorList { get; init; }
         public string genres { get; init; }
         public string languages { get; init; }
         public string imDbRating { get; init; }
@@ -19,13 +19,13 @@ namespace MovieApp.Responses
         public string[] keywordList { get; init; }
     }
 
-    public record Director
+    public record DirectorResponse
     {
         public string id { get; init; }
         public string name { get; init; }
     }
 
-    public record Actor
+    public record ActorResponse
     {
         public string id { get; init; }
         public string name { get; init; }

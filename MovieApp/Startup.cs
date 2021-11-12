@@ -24,67 +24,69 @@ using Refit;
 
 namespace MovieApp
 {
-  [ExcludeFromCodeCoverage]
-  public class Startup
-  {
-    public Startup(IConfiguration configuration)
+    [ExcludeFromCodeCoverage]
+    public class Startup
     {
-      Configuration = configuration;
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureServices(IServiceCollection services)
+        {
+
+            services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "MovieApp", Version = "v1" });
+            });
+            BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
+            BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
+            var mongoDbSettings = Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
+
+            services.AddSingleton<IMongoClient>(serviceProvider =>
+            {
+                return new MongoClient(mongoDbSettings.ConnectionString);
+            });
+
+            services.AddSingleton<IImdbApi>(serviceProvider =>
+            {
+                return RestService.For<IImdbApi>("https://imdb-api.com/en/");
+            });
+
+            services.AddSingleton<IMoviesRepository, MoviesRepository>();
+
+            services.AddSingleton<IImdbSearchService, ImdbSearchService>();
+
+            services.AddControllers(options =>
+            {
+                options.SuppressAsyncSuffixInActionNames = false;
+            });
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MovieApp v1"));
+            }
+
+            app.UseHttpsRedirection();
+
+            app.UseRouting();
+
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+        }
     }
-
-    public IConfiguration Configuration { get; }
-
-    // This method gets called by the runtime. Use this method to add services to the container.
-    public void ConfigureServices(IServiceCollection services)
-    {
-
-      services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-      services.AddSwaggerGen(c =>
-      {
-        c.SwaggerDoc("v1", new OpenApiInfo { Title = "MovieApp", Version = "v1" });
-      });
-      BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
-      BsonSerializer.RegisterSerializer(new DateTimeOffsetSerializer(BsonType.String));
-      var mongoDbSettings = Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
-
-      services.AddSingleton<IMongoClient>(serviceProvider =>
-      {
-        return new MongoClient(mongoDbSettings.ConnectionString);
-      });
-
-      services.AddSingleton<IImdbApi>(serviceProvider =>
-      {
-        return RestService.For<IImdbApi>("https://imdb-api.com/en/");
-      });
-
-      services.AddSingleton<IMoviesRepository, MoviesRepository>();
-
-      services.AddControllers(options =>
-      {
-        options.SuppressAsyncSuffixInActionNames = false;
-      });
-    }
-
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-    {
-      if (env.IsDevelopment())
-      {
-        app.UseDeveloperExceptionPage();
-        app.UseSwagger();
-        app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MovieApp v1"));
-      }
-
-      app.UseHttpsRedirection();
-
-      app.UseRouting();
-
-      app.UseAuthorization();
-
-      app.UseEndpoints(endpoints =>
-      {
-        endpoints.MapControllers();
-      });
-    }
-  }
 }
